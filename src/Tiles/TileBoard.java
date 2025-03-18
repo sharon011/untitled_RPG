@@ -1,11 +1,11 @@
 package Tiles;
 
 import main.GamePanel;
+import main.Utility;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.*;
-import java.util.Objects;
 
 public class TileBoard {
 
@@ -17,24 +17,34 @@ public class TileBoard {
     public TileBoard(GamePanel gp){
         this.gp = gp;
         resourceTiles = new Tile[3];
-        map = new int[gp.maxWorldCol][gp.maxWorldRow];
+        map = new int[gp.MAX_MAP_COLUMNS][gp.MAX_MAP_ROWS];
 
         getTileImage();
         loadMap();
     }
 
     public void getTileImage(){
-        try{
-            resourceTiles[0] = new Tile();
-            resourceTiles[0].image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/grass.png")));
+            setup(0,"grass", false);
+            setup(1,"stone", true);
 
-            resourceTiles[1] = new Tile();
-            resourceTiles[1].image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/stone.png")));
-            resourceTiles[1].collision = true;
-        }catch(IOException e){
+    }
+
+    public void setup(int index, String imagePath, boolean collision){
+        Utility utility = new Utility();
+
+        try{
+            resourceTiles[index] = new Tile();
+            resourceTiles[index].image = ImageIO.read(getClass().getResourceAsStream("/tiles/" + imagePath + ".png"));
+            resourceTiles[index].image = utility.scaleImage(resourceTiles[index].image, gp.tileSize, gp.tileSize);
+            resourceTiles[index].collision = collision;
+
+        }catch (IOException e){
             e.printStackTrace();
         }
     }
+
+
+
 
     public void loadMap(){
         try{
@@ -44,12 +54,12 @@ public class TileBoard {
             int col = 0;
             int row = 0;
 
-            while(col < gp.maxWorldCol && row < gp.maxWorldRow){
+            while(col < gp.MAX_MAP_COLUMNS && row < gp.MAX_MAP_ROWS){
 
                 String line = br.readLine();
 
                 //Using while loop for the ability to declare a variable inside the loop.
-                while(col < gp.maxWorldCol && line != null){
+                while(col < gp.MAX_MAP_COLUMNS && line != null){
                     String[] lineAsChar = line.split(" ");
 
                     int num = Integer.parseInt(lineAsChar[col]);
@@ -70,27 +80,27 @@ public class TileBoard {
         int worldCol = 0;
         int worldRow = 0;
 
-        while(worldCol < gp.maxWorldCol && worldRow < gp.maxWorldRow){
+        while(worldCol < gp.MAX_MAP_COLUMNS && worldRow < gp.MAX_MAP_ROWS){
 
             int tile = map[worldCol][worldRow];
 
             int worldX = worldCol * gp.tileSize;
             int worldY = worldRow * gp.tileSize;
-            int playerX = worldX - gp.player.mapX + gp.player.playerX;
-            int playerY = worldY - gp.player.mapY + gp.player.playerY;
+            int playerX = worldX - gp.player.mapX + gp.player.player_x_coordinate;
+            int playerY = worldY - gp.player.mapY + gp.player.player_y_coordinate;
 
-            if(worldX + gp.tileSize > gp.player.mapX - gp.player.playerX &&
-                    worldX - gp.tileSize < gp.player.mapX + gp.player.playerX &&
-                    worldY + gp.tileSize > gp.player.mapY - gp.player.playerY &&
-                    worldY - gp.tileSize < gp.player.mapY + gp.player.playerY){
+            if(worldX + gp.tileSize > gp.player.mapX - gp.player.player_x_coordinate &&
+                    worldX - gp.tileSize < gp.player.mapX + gp.player.player_x_coordinate &&
+                    worldY + gp.tileSize > gp.player.mapY - gp.player.player_y_coordinate &&
+                    worldY - gp.tileSize < gp.player.mapY + gp.player.player_y_coordinate){
 
-                g.drawImage(resourceTiles[tile].image, playerX, playerY, gp.tileSize, gp.tileSize, null);
+                g.drawImage(resourceTiles[tile].image, playerX, playerY,null);
 
             }
 
             worldCol++;
 
-            if(worldCol == gp.maxWorldCol) {
+            if(worldCol == gp.MAX_MAP_COLUMNS) {
                 worldCol = 0;
                 worldRow++;
             }

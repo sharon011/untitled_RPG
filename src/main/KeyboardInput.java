@@ -2,55 +2,55 @@ package main;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.HashSet;
+import java.util.Set;
 
 public class KeyboardInput implements KeyListener {
 
+    public final Set<String> pressedKeys = new HashSet<>();
 
     @Override
     public void keyTyped(KeyEvent e) {
 
     }
+
     public boolean upPressed, leftPressed, downPressed, rightPressed;
+    GamePanel gp;
+
+    public void KeyPressed(GamePanel gp) {
+
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
         //TODO figure how to add diagonal walk with collision detection.
         int code = e.getKeyCode();
 
-        switch(code){
-            case KeyEvent.VK_W:
-                upPressed = true;
-                break;
-            case KeyEvent.VK_A:
-                leftPressed = true;
-                break;
-            case KeyEvent.VK_D:
-                rightPressed = true;
-                break;
-            case KeyEvent.VK_S:
-                downPressed = true;
-                break;
-        }
+        if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP)
+            pressedKeys.add("up");
+        if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT)
+            pressedKeys.add("left");
+        if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT)
+            pressedKeys.add("right");
+        if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN)
+            pressedKeys.add("down");
 
     }
+
 
     @Override
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
-        switch(code) {
-            case KeyEvent.VK_W:
-                upPressed = false;
-                break;
-            case KeyEvent.VK_A:
-                leftPressed = false;
-                break;
-            case KeyEvent.VK_D:
-                rightPressed = false;
-                break;
-            case KeyEvent.VK_S:
-                downPressed = false;
-                break;
 
-        }
+        if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP)
+            pressedKeys.remove("up");
+        if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT)
+            pressedKeys.remove("left");
+        if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT)
+            pressedKeys.remove("right");
+        if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN)
+            pressedKeys.remove("down");
 
     }
+
 }
