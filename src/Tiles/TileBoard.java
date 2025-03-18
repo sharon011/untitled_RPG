@@ -16,7 +16,7 @@ public class TileBoard {
 
     public TileBoard(GamePanel gp){
         this.gp = gp;
-        resourceTiles = new Tile[3];
+        resourceTiles = new Tile[30];
         map = new int[gp.MAX_MAP_COLUMNS][gp.MAX_MAP_ROWS];
 
         getTileImage();
@@ -26,6 +26,26 @@ public class TileBoard {
     public void getTileImage(){
             setup(0,"grass", false);
             setup(1,"stone", true);
+            setup(2, "treeGrass", true);
+            setup(3, "singlePath", false);
+            setup(4,"doublePath1", false);
+            setup(5,"doublePath2", false);
+            setup(6,"fullPath", false);
+            setup(7,"pathTopLeft", false);
+            setup(8,"pathBottomRight",false);
+            setup(9,"pathTopRight", false);
+            setup(10,"pathBottomLeft", false);
+            setup(11,"doublePathBottom", false);
+            setup(12, "lakeBottomLeft", true);
+            setup(13,"lakeBottomMid", true);
+            setup(14,"lakeBottomRight", true);
+            setup(15, "lakeMidLeft",true);
+            setup(16,"lakeMidMid", true);
+            setup(17, "lakeMidRight", true);
+            setup(18, "lakeTopLeft",true);
+            setup(19,"lakeTopMid", true);
+            setup(20,"lakeTopRight", true);
+            setup(21,"singlePathHorizontal", false);
 
     }
 
@@ -86,13 +106,13 @@ public class TileBoard {
 
             int worldX = worldCol * gp.tileSize;
             int worldY = worldRow * gp.tileSize;
-            int playerX = worldX - gp.player.mapX + gp.player.player_x_coordinate;
-            int playerY = worldY - gp.player.mapY + gp.player.player_y_coordinate;
+            int playerX = (int) (worldX - gp.player.entity_X + gp.player.cameraX);
+            int playerY = (int) (worldY - gp.player.entity_Y + gp.player.cameraY);
 
-            if(worldX + gp.tileSize > gp.player.mapX - gp.player.player_x_coordinate &&
-                    worldX - gp.tileSize < gp.player.mapX + gp.player.player_x_coordinate &&
-                    worldY + gp.tileSize > gp.player.mapY - gp.player.player_y_coordinate &&
-                    worldY - gp.tileSize < gp.player.mapY + gp.player.player_y_coordinate){
+            if(worldX + gp.tileSize > gp.player.entity_X - gp.player.cameraX &&
+                    worldX - gp.tileSize < gp.player.entity_X + gp.player.cameraX &&
+                    worldY + gp.tileSize > gp.player.entity_Y - gp.player.cameraY &&
+                    worldY - gp.tileSize < gp.player.entity_Y + gp.player.cameraY){
 
                 g.drawImage(resourceTiles[tile].image, playerX, playerY,null);
 

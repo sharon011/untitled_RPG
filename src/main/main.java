@@ -8,7 +8,7 @@ public class main {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(false);
-        frame.setTitle("Game name");
+        frame.setTitle("Untitled_RPG");
 
         GamePanel gamePanel = new GamePanel();
         frame.add(gamePanel);

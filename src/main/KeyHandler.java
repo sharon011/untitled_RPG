@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 import java.util.HashSet;
 import java.util.Set;
 
-public class KeyboardInput implements KeyListener {
+public class KeyHandler implements KeyListener {
 
     public final Set<String> pressedKeys = new HashSet<>();
 
@@ -14,7 +14,6 @@ public class KeyboardInput implements KeyListener {
 
     }
 
-    public boolean upPressed, leftPressed, downPressed, rightPressed;
     GamePanel gp;
 
     public void KeyPressed(GamePanel gp) {

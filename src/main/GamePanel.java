@@ -1,6 +1,7 @@
 package main;
 
 import Entities.Player;
+import HUD.UI;
 import Tiles.TileBoard;
 import objects.SuperObject;
 
@@ -20,22 +21,28 @@ public class GamePanel extends JPanel implements Runnable {
     public final int MAX_MAP_COLUMNS = 50;
     public final int MAX_MAP_ROWS = 50;
 
+    private final double NANO_SECOND = 1_000_000_000;
+    private double targetFPS = 90;
+    private double OPTIMAL_TIME = NANO_SECOND / targetFPS;
 
-    final int nanoSecond = 1000000000;
+    int fps = 0;
+    int frameCount = 0;
+    long lastTime = System.nanoTime();
+    long lastFPSCheck = System.currentTimeMillis();
 
-    int fps = 60;
 
-    //Initiate inputs and entities.
+    //Initialize inputs, entities and objects.
     TileBoard tb = new TileBoard(this);
-    KeyboardInput keyInput = new KeyboardInput();
+    KeyHandler keyInput = new KeyHandler();
     Thread gameThread;
     public Player player = new Player(this, keyInput);
     public CollisionValidation cv = new CollisionValidation(this);
     public SuperObject[] obj = new SuperObject[10];
     public AssetSetter as = new AssetSetter(this);
+    public UI ui = new UI(this);
 
 
-    public GamePanel(){
+    public GamePanel() {
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
@@ -43,11 +50,11 @@ public class GamePanel extends JPanel implements Runnable {
         this.setFocusable(true);
     }
 
-    public void setupGame(){
+    public void setupGame() {
         as.setObject();
     }
 
-    public void startGameThread(){
+    public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
     }
@@ -58,68 +65,54 @@ public class GamePanel extends JPanel implements Runnable {
      */
     @Override
     public void run() {
-        double frameInterval = (double)nanoSecond / fps;
-        double nextFrameDraw = System.nanoTime() + frameInterval;
-        double lastTime = System.nanoTime();
-        double newTime;
-        double timer = 0;
-        int countFPS = 0;
+
 
         while (gameThread != null) {
+            long now = System.nanoTime();
+            long updateLength = now - lastTime;
+            lastTime = now;
 
-            newTime = System.nanoTime();
+            frameCount++;
+            if (System.currentTimeMillis() - lastFPSCheck >= 1000) {
+                fps = frameCount;
+                frameCount = 0;
+                lastFPSCheck = System.currentTimeMillis();
+                //System.out.println("FPS: " + fps);
 
-            update();
-
-            repaint();
-
-            countFPS++;
-
-            timer += newTime - lastTime; //Start of FPS counter.
-            if(timer >= nanoSecond) {
-                System.out.println("FPS counted: " + countFPS);
-                countFPS = 0;
-                timer = 0;
             }
 
-            lastTime = newTime;
+            update(updateLength / NANO_SECOND);
+            repaint();
 
-            try {
-                double remainingTime = nextFrameDraw - System.nanoTime();
-                remainingTime = remainingTime / 1000000;
-
-                if (remainingTime < 0) {
-                    remainingTime = 0;
+            long sleepTime = (long) ((OPTIMAL_TIME - (System.nanoTime() - now)) / 1_000_000);
+            if(sleepTime > 0){
+                try{
+                    Thread.sleep(sleepTime);
+                }catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-
-                Thread.sleep((long)remainingTime);
-                nextFrameDraw += frameInterval;
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
     }
 
-    public void update() {
-
-        player.update();
-
+    public void update(double deltaTime) {
+        player.update(deltaTime);
     }
 
-    public void paintComponent(Graphics g){
+    public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D)g;
+        Graphics2D g2 = (Graphics2D) g;
 
         tb.draw(g2);
         drawObj(g2);
         player.draw(g2);
+        ui.draw(g2);
 
         g2.dispose();
     }
 
 
-    private void drawObj(Graphics2D g2){
+    private void drawObj(Graphics2D g2) {
         for (SuperObject superObject : obj) {
             if (superObject != null) {
                 superObject.draw(this, g2);
@@ -128,8 +121,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
 
-
-    public void zoomInOut(int code){
+    public void zoomInOut(int code) {
 
     }
 }
